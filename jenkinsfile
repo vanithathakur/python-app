@@ -1,0 +1,26 @@
+pipeline{
+    agent any
+    stages{
+        stage(build and push){
+            steps{
+                sh```
+                whoami
+                aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 026658994832.dkr.ecr.us-east-2.amazonaws.com
+                docker build -t python-app-project .
+                docker tag python-app-project:latest 026658994832.dkr.ecr.us-east-2.amazonaws.com/python-app-project:${BUILD_NUMBER}
+                docker push 026658994832.dkr.ecr.us-east-2.amazonaws.com/python-app-project:${BUILD_NUMBER}
+                ```
+            }
+        }
+        stage(deploy){
+            steps{
+                sh```
+                ssh -i /var/lib/jenkins/ubuntu.pem -o strictHostkeychecking=no ubuntu@ec2-18-225-55-103.us-east-2.compute.amazonaws.com bash-s
+            }
+        }
+
+    }
+
+
+    }
+}
